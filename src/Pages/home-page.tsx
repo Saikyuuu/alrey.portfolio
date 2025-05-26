@@ -19,6 +19,24 @@ import MuxPlayer from "@mux/mux-player-react";
 export default function HomePage() {
   const [activeSection, setActiveSection] = useState("home");
 
+  function useResponsiveVisible() {
+    const [visible, setVisible] = useState(3);
+
+    useEffect(() => {
+      const update = () => {
+        const w = window.innerWidth;
+        if (w < 640) setVisible(1); // Mobile
+        else if (w < 1024) setVisible(2); // Tablet
+        else setVisible(3); // Desktop
+      };
+      update();
+      window.addEventListener("resize", update);
+      return () => window.removeEventListener("resize", update);
+    }, []);
+
+    return visible;
+  }
+
   const services = [
     {
       title: "Video Editing",
@@ -79,9 +97,9 @@ export default function HomePage() {
     element?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const VISIBLE = 3;
+  const visibleCount = useResponsiveVisible(); // instead of const VISIBLE = 3
   const [idx, setIdx] = useState(0);
-  const maxIdx = videos.length - VISIBLE;
+  const maxIdx = videos.length - visibleCount;
 
   type HTMLMuxPlayerElement = HTMLElement & {
     play?: () => void;
@@ -257,13 +275,15 @@ export default function HomePage() {
             {/* Track */}
             <div
               className="flex gap-3 transition-transform duration-500 scale-[95%]"
-              style={{ transform: `translateX(-${(100 / VISIBLE) * idx}%)` }}
+              style={{
+                transform: `translateX(-${(100 / visibleCount) * idx}%)`,
+              }}
             >
               {videos.map((video, i) => (
                 <div
                   key={i}
                   className="flex-shrink-0 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden"
-                  style={{ width: `${100 / VISIBLE}%` }}
+                  style={{ width: `${100 / visibleCount}%` }}
                 >
                   <div className="relative aspect-[9/16]">
                     <MuxPlayer
