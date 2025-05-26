@@ -1,9 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { Play, Award, Clock, Users, Mail, Phone, MapPin } from "lucide-react";
+import {
+  Play,
+  Award,
+  Clock,
+  Users,
+  Mail,
+  Phone,
+  MapPin,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import ParticleImage from "@/components/particle-image";
 import profileImage from "../assets/profile.png";
+import MuxPlayer from "@mux/mux-player-react";
 
 export default function HomePage() {
   const [activeSection, setActiveSection] = useState("home");
@@ -35,42 +46,30 @@ export default function HomePage() {
     },
   ];
 
-  const portfolio = [
+  const videos = [
     {
-      title: "Tech Startup Commercial",
-      category: "Commercial",
-      duration: "2:30",
-      thumbnail: "/placeholder.svg?height=200&width=350",
+      playbackId: "BDM024NQwKrsPWnhmj00OnK3n2JbBfcWIDKWLRarIm4J4",
+      title: "Podcast Video 1",
     },
     {
-      title: "Wedding Highlight Reel",
-      category: "Wedding",
-      duration: "4:15",
-      thumbnail: "/placeholder.svg?height=200&width=350",
+      playbackId: "FpBaP5eo3O1iN00374BfSPcn5upKRgcJYphSkzRr2YoY",
+      title: "Podcast Video 2",
     },
     {
-      title: "Product Launch Video",
-      category: "Product",
-      duration: "1:45",
-      thumbnail: "/placeholder.svg?height=200&width=350",
+      playbackId: "zH65ARTrLLx911D2jy01ROyPtIXwQH2M7QBMM6rgsfw4",
+      title: "Podcast Video 3",
     },
     {
-      title: "Documentary Short",
-      category: "Documentary",
-      duration: "8:20",
-      thumbnail: "/placeholder.svg?height=200&width=350",
+      playbackId: "C4O9uoGggGOfqQuUBWO9kRPIlJ7ltKArmPICbaajE02k",
+      title: "Podcast Video 4",
     },
     {
-      title: "Social Media Campaign",
-      category: "Social Media",
-      duration: "0:30",
-      thumbnail: "/placeholder.svg?height=200&width=350",
+      playbackId: "pqXLAu1XJ5P01YTLmUePyU3HeIHnBiOeKwgOYFxloO02E",
+      title: "Podcast Video 5",
     },
     {
-      title: "Music Video",
-      category: "Music",
-      duration: "3:45",
-      thumbnail: "/placeholder.svg?height=200&width=350",
+      playbackId: "JZo00AfUlI01ZmUnaUmfQtij5yvkKq8Jf5VcxeiodXN4E",
+      title: "Podcast Video 6",
     },
   ];
 
@@ -79,6 +78,13 @@ export default function HomePage() {
     const element = document.getElementById(sectionId);
     element?.scrollIntoView({ behavior: "smooth" });
   };
+
+  const VISIBLE = 3;
+  const [idx, setIdx] = useState(0);
+  const maxIdx = videos.length - VISIBLE;
+
+  const prev = () => setIdx((i) => Math.max(0, i - 1));
+  const next = () => setIdx((i) => Math.min(maxIdx, i + 1));
 
   return (
     <div className="relative min-h-screen text-white overflow-hidden">
@@ -156,7 +162,7 @@ export default function HomePage() {
             <div>
               <img
                 src={profileImage}
-                alt="Alex Chen"
+                alt="Allen Grammer"
                 className="rounded-2xl w-full max-w-md mx-auto"
               />
             </div>
@@ -209,38 +215,61 @@ export default function HomePage() {
       </section>
 
       {/* Portfolio Section */}
-      <section id="portfolio" className="py-20">
-        <div className="max-w-7xl mx-auto px-6">
+      <section id="portfolio" className="py-10">
+        <div className="max-w-5xl mx-auto px-4 relative">
           <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
             Portfolio
           </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {portfolio.map((project, index) => (
-              <div
-                key={index}
-                className="group bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden hover:bg-white/10 transition-all duration-300 transform hover:scale-105"
-              >
-                <div className="relative overflow-hidden">
-                  <img
-                    src={project.thumbnail || "/placeholder.svg"}
-                    alt={project.title}
-                    className="w-full h-100 object-cover group-hover:scale-110 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <Play className="w-12 h-12 text-white" />
+
+          {/* Carousel Wrapper */}
+          <div className="relative overflow-hidden">
+            {/* Prev Button */}
+            <button
+              onClick={prev}
+              disabled={idx === 0}
+              className="absolute flex items-center justify-center top-1/2 left-2 z-10 p-1 bg-black/50 hover:bg-black/70 rounded-full transform -translate-y-1/2 disabled:opacity-30 w-10 h-10"
+            >
+              <ChevronLeft className="w-7 h-7 text-white" />
+            </button>
+
+            {/* Track */}
+            <div
+              className="flex gap-3 transition-transform duration-500 scale-[95%]"
+              style={{ transform: `translateX(-${(100 / VISIBLE) * idx}%)` }}
+            >
+              {videos.map((video, i) => (
+                <div
+                  key={i}
+                  className="flex-shrink-0 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden"
+                  style={{ width: `${100 / VISIBLE}%` }}
+                >
+                  <div className="relative aspect-[9/16]">
+                    <MuxPlayer
+                      playbackId={video.playbackId}
+                      streamType="on-demand"
+                      metadata={{
+                        video_title: video.title,
+                        viewer_user_id: "Placeholder",
+                      }}
+                      className="w-full h-full"
+                    />
                   </div>
-                  <div className="absolute top-4 right-4 bg-black/70 px-2 py-1 rounded text-sm">
-                    {project.duration}
+                  <div className="p-3">
+                    <div className="text-xs text-blue-400 mb-1">Podcast</div>
+                    <h3 className="text-sm font-semibold">{video.title}</h3>
                   </div>
                 </div>
-                <div className="p-6">
-                  <div className="text-sm text-blue-400 mb-2">
-                    {project.category}
-                  </div>
-                  <h3 className="text-xl font-semibold">{project.title}</h3>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
+
+            {/* Next Button */}
+            <button
+              onClick={next}
+              disabled={idx === maxIdx}
+              className="absolute flex items-center justify-center top-1/2 right-2 z-10 p-1 bg-black/50 hover:bg-black/70 rounded-full transform -translate-y-1/2 disabled:opacity-30 w-10 h-10"
+            >
+              <ChevronRight className="w-7 h-7 text-white" />
+            </button>
           </div>
         </div>
       </section>
