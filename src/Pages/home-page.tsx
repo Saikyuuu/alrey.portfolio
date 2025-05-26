@@ -168,7 +168,7 @@ export default function HomePage() {
         className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden"
       >
         {/* Particle background */}
-        <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 z-0 hidden sm:block">
           <ParticleImage imageSrc={profileImage} />
         </div>
 
