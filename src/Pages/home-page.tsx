@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   Play,
   Award,
@@ -82,6 +82,28 @@ export default function HomePage() {
   const VISIBLE = 3;
   const [idx, setIdx] = useState(0);
   const maxIdx = videos.length - VISIBLE;
+
+  type HTMLMuxPlayerElement = HTMLElement & {
+    play?: () => void;
+    pause?: () => void;
+    currentTime?: number;
+  };
+
+  const playerRefs = useRef<(HTMLMuxPlayerElement | null)[]>([]);
+  const lastPlayedIndex = useRef<number | null>(null);
+
+  const handlePlay = (currentIndex: number) => {
+    if (
+      lastPlayedIndex.current !== null &&
+      lastPlayedIndex.current !== currentIndex
+    ) {
+      const lastPlayer = playerRefs.current[lastPlayedIndex.current];
+      if (lastPlayer && typeof lastPlayer.pause === "function") {
+        lastPlayer.pause();
+      }
+    }
+    lastPlayedIndex.current = currentIndex;
+  };
 
   const prev = () => setIdx((i) => Math.max(0, i - 1));
   const next = () => setIdx((i) => Math.min(maxIdx, i + 1));
@@ -251,6 +273,10 @@ export default function HomePage() {
                         video_title: video.title,
                         viewer_user_id: "Placeholder",
                       }}
+                      ref={(el) => {
+                        playerRefs.current[i] = el;
+                      }}
+                      onPlay={() => handlePlay(i)}
                       className="w-full h-full"
                     />
                   </div>
