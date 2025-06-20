@@ -62,8 +62,8 @@ const ParticleImage = ({ imageSrc }: { imageSrc: string }) => {
           const distance = Math.sqrt(dx * dx + dy * dy);
 
           // Slower movement
-          p.x += dx * 0.1;
-          p.y += dy * 0.1;
+          p.x += dx * 0.3;
+          p.y += dy * 0.3;
 
           // Opacity increase based on distance
           const maxDistance = 100;
@@ -88,7 +88,7 @@ const ParticleImage = ({ imageSrc }: { imageSrc: string }) => {
 
   return (
     <div className="flex items-center justify-center w-full h-screen ">
-      <canvas ref={canvasRef} className="block w-[1000px] h-auto max-w-full" />
+      <canvas ref={canvasRef} className="block w-[650px] h-auto max-w-full" />
     </div>
   );
 };

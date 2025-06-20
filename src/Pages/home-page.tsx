@@ -13,8 +13,9 @@ import {
   ChevronRight,
 } from "lucide-react";
 import ParticleImage from "@/components/particle-image";
-import profileImage from "../assets/profile.png";
+import profileImage from "../assets/portrait.png";
 import MuxPlayer from "@mux/mux-player-react";
+import emailjs from "@emailjs/browser";
 
 export default function HomePage() {
   const [activeSection, setActiveSection] = useState("home");
@@ -126,22 +127,54 @@ export default function HomePage() {
   const prev = () => setIdx((i) => Math.max(0, i - 1));
   const next = () => setIdx((i) => Math.min(maxIdx, i + 1));
 
+  const categories = [
+    "UGC Content",
+    "YT Shorts",
+    "Podcast Shorts",
+    "Commercial Videos",
+  ];
+  const [activeCategory, setActiveCategory] = useState("UGC Content");
+
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const sendEmail = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!formRef.current) return;
+
+    emailjs
+      .sendForm(
+        "service_z4i1fvp",
+        "template_r6zca43",
+        formRef.current,
+        "-FAeEIwzQbNqHw0bp"
+      )
+      .then(
+        () => {
+          alert("Message sent successfully!");
+          formRef.current?.reset();
+        },
+        (error) => {
+          console.error(error);
+          alert("Failed to send message. Please try again.");
+        }
+      );
+  };
+
   return (
     <div className="relative min-h-screen text-white overflow-hidden">
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-md border-b border-white/10">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-              Grammedia
-            </div>
+            <div className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent"></div>
             <div className="hidden md:flex space-x-8">
               {["home", "about", "services", "portfolio", "contact"].map(
                 (section) => (
                   <button
                     key={section}
                     onClick={() => scrollToSection(section)}
-                    className={`capitalize transition-colors duration-300 hover:text-blue-400 ${
+                    className={` cursor-pointer capitalize transition-colors duration-300 hover:text-blue-400 ${
                       activeSection === section
                         ? "text-blue-400"
                         : "text-gray-300"
@@ -175,7 +208,7 @@ export default function HomePage() {
         {/* Foreground content */}
         <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
           <h1 className="text-6xl md:text-8xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
-            Grammer Allen
+            Alrey Alfarero
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto">
             Bringing stories to life through cinematic editing, color grading,
@@ -208,23 +241,23 @@ export default function HomePage() {
             </div>
             <div className="space-y-6">
               <p className="text-lg text-gray-300 leading-relaxed">
-                With over 8 years of experience in video editing and
+                With over 2 years of experience in video editing and
                 post-production, I specialize in creating compelling visual
                 narratives that captivate audiences and drive results.
               </p>
               <p className="text-lg text-gray-300 leading-relaxed">
-                From corporate commercials to wedding films, I bring technical
+                From corporate commercials to UGC contents, I bring technical
                 expertise and creative vision to every project. My goal is to
                 transform raw footage into polished, professional content that
                 exceeds expectations.
               </p>
               <div className="grid grid-cols-2 gap-6 pt-6">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-blue-400">150+</div>
+                  <div className="text-3xl font-bold text-blue-400">100+</div>
                   <div className="text-gray-400">Projects Completed</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-purple-400">8+</div>
+                  <div className="text-3xl font-bold text-purple-400">2+</div>
                   <div className="text-gray-400">Years Experience</div>
                 </div>
               </div>
@@ -261,6 +294,23 @@ export default function HomePage() {
             Portfolio
           </h2>
 
+          {/* Category Navigation */}
+          <div className="flex flex-wrap justify-center gap-2 mb-10">
+            {categories.map((category) => (
+              <button
+                key={category}
+                onClick={() => setActiveCategory(category)}
+                className={`px-6 py-2 rounded-full transition-all duration-200 ${
+                  activeCategory === category
+                    ? "bg-blue-600 text-white shadow-lg"
+                    : "bg-white/10 text-gray-300 hover:bg-white/20 border border-white/10"
+                }`}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+
           {/* Carousel Wrapper */}
           <div className="relative overflow-hidden">
             {/* Prev Button */}
@@ -274,7 +324,7 @@ export default function HomePage() {
 
             {/* Track */}
             <div
-              className="flex gap-3 transition-transform duration-500 scale-[95%]"
+              className="flex gap-3 transition-transform duration-500"
               style={{
                 transform: `translateX(-${(100 / visibleCount) * idx}%)`,
               }}
@@ -285,7 +335,7 @@ export default function HomePage() {
                   className="flex-shrink-0 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden"
                   style={{ width: `${100 / visibleCount}%` }}
                 >
-                  <div className="relative aspect-[9/16]">
+                  <div className="relative aspect-[9/16] w-full max-w-[240px] mx-auto">
                     <MuxPlayer
                       playbackId={video.playbackId}
                       streamType="on-demand"
@@ -297,11 +347,13 @@ export default function HomePage() {
                         playerRefs.current[i] = el;
                       }}
                       onPlay={() => handlePlay(i)}
-                      className="w-full h-full"
+                      className="absolute inset-0 w-full h-full object-cover rounded-xl"
                     />
                   </div>
                   <div className="p-3">
-                    <div className="text-xs text-blue-400 mb-1">Podcast</div>
+                    <div className="text-xs text-blue-400 mb-1">
+                      {activeCategory}
+                    </div>
                     <h3 className="text-sm font-semibold">{video.title}</h3>
                   </div>
                 </div>
@@ -341,43 +393,49 @@ export default function HomePage() {
               <div className="space-y-4">
                 <div className="flex items-center space-x-4">
                   <Mail className="w-6 h-6 text-blue-400" />
-                  <span>grammedia2@gmail.com</span>
+                  <span>alrey.developer@gmail.com</span>
                 </div>
                 <div className="flex items-center space-x-4">
                   <Phone className="w-6 h-6 text-blue-400" />
-                  <span>+639 09912 9159</span>
+                  <span>+63 09355390590</span>
                 </div>
                 <div className="flex items-center space-x-4">
                   <MapPin className="w-6 h-6 text-blue-400" />
-                  <span>Los Angeles, CA</span>
+                  <span>Maramag Bukidnon, Philippines</span>
                 </div>
               </div>
             </div>
-            <form className="space-y-6">
+            <form ref={formRef} onSubmit={sendEmail} className="space-y-6">
               <div>
                 <input
                   type="text"
+                  name="user_name"
                   placeholder="Your Name"
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-400 transition-colors duration-300"
+                  required
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3"
                 />
               </div>
               <div>
                 <input
                   type="email"
+                  name="user_email"
                   placeholder="Your Email"
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-400 transition-colors duration-300"
+                  required
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3"
                 />
               </div>
               <div>
                 <textarea
+                  name="message"
                   placeholder="Tell me about your project..."
                   rows={5}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-400 transition-colors duration-300 resize-none"
+                  required
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 resize-none"
                 ></textarea>
               </div>
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-blue-500 to-purple-500 py-3 rounded-lg font-semibold hover:from-blue-600 hover:to-purple-600 transition-all duration-300"
+                className="w-full bg-gradient-to-r from-blue-500 to-purple-500 py-3 rounded-lg font-semibold hover:from-blue-600 hover:to-purple-600"
               >
                 Send Message
               </button>
@@ -390,7 +448,7 @@ export default function HomePage() {
       <footer className="py-12 border-t border-white/10">
         <div className="max-w-6xl mx-auto px-6 text-center">
           <div className="text-2xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-            Grammer Allen
+            Alrey Alfarero
           </div>
           <p className="text-gray-400 mb-6">
             Professional Video Editor & Motion Graphics Artist
